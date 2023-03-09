@@ -1,0 +1,52 @@
+@ nexus server
+
+******************note that: you should create an user for nexus and give it the privilege to run the nexus server***************
+[root@master ~]# useradd nexus
+[root@master ~]# passwd nexus
+[root@master ~]# chown -R nexus:nexus nexus-3.47.1-01/
+[root@master ~]# chown -R nexus:nexus sonatype-work/
+
+
+
+[nexus@master bin]$ /opt/nexus-3.47.1-01/bin/nexus start
+ 
+***********************To configure the firewall*****************************
+[nexus@master bin]$ firewall-cmd --add-port=8081/tcp --zone=public permenant
+[nexus@master bin]$ firewall-cmd --add-port=8081/tcp --zone=public --permanent
+[nexus@master bin]$ firewall-cmd --add-port=8083/tcp --zone=public --permanent
+
+
+********************************To allow login to HTTP nexus server************************
+[root@localhost web]# sudo nano /etc/containers/registries.conf
+
+
+[[registry]]
+location="192.168.1.15:8080"
+insecure=true
+
+short-name-mode = "enforcing"
+
+
+
+***************************To login to Image repository **********************
+[root@localhost web]# docker login http://192.168.1.15:8080/repository/docker2/
+  
+
+
+*********************************To Build the image ******************************
+[root@localhost app]# podman build -t my-app:2.1 /home/mahmoud/Desktop/Jenkins/web/untitled/nodejs-project2/nodejs-project/app/
+
+
+
+
+*******************************To retag the Image**********************************
+[root@localhost app]# docker tag my-app:1.5 192.168.1.15:8080/my-app:1.5
+
+
+
+********************************To push the Image***********************************
+[root@localhost app]# docker push my-app:1.5 192.168.1.15:8080/my-app:1.5
+
+
+
+
